@@ -2,9 +2,17 @@
 using System.Collections;
 using System.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace BSFDTestbed
 {
+    public class AttachPivot : MonoBehaviour
+    {
+        public int ID; // ID of this Pivot
+        public GameObject attachmentPoint; // GameObject, parent of Part upon attachment.
+        public Collider attachmentTrigger; // Collider, Trigger, used for collision test between partTrigger.
+    }
+
     public class Part : MonoBehaviour
     {
         //Bolt related variables
@@ -15,13 +23,14 @@ namespace BSFDTestbed
 
         //part(self) related variables
         public bool isFitted; // Self explanatory
+        public int FittmentID; // ID of the current AttachPivot
         public bool disableColliders = false;
         public bool destroyRigidbody = false;
         public Collider partTrigger; // Trigger of part, used for collision test between attachmentTrigger.
 
-        //part(thing you are attaching to) related variables
-        public GameObject attachmentPoint; // GameObject, parent of Part upon attachment.
-        public Collider attachmentTrigger; // Collider, Trigger, used for collision test between partTrigger.
+        //parts(things you are attaching to) related variables
+        public List<AttachPivot> Pivots;
+        private AttachPivot CurrentPivot;
 
         //events
         public delegate void AttachDelegate();
@@ -45,6 +54,19 @@ namespace BSFDTestbed
             if (bolts.Length != 0 && boltParent != null)
             {
                 StartCoroutine(UpdatePartTightness());
+            }
+
+            UpdateIDs();
+        }
+
+        public void UpdateIDs() // Only Call in Void Start
+        {
+            int i = 0;
+
+            foreach (AttachPivot pivots in Pivots)
+            {
+                pivots.ID = i;
+                i++;
             }
         }
 
@@ -78,27 +100,30 @@ namespace BSFDTestbed
 
         void OnTriggerStay(Collider other)
         {
-            if (other == attachmentTrigger && canAttach())
+            if (other.GetComponent<AttachPivot>() != null && other.GetComponent<AttachPivot>().attachmentTrigger == other && canAttach(other.GetComponent<AttachPivot>()))
             {
                 BSFDinteraction.GUIAssemble.Value = true;
                 if (Input.GetMouseButtonDown(0))
                 {
-                    Attach(true);
+                    Attach(true, other.GetComponent<AttachPivot>().ID);
                     BSFDinteraction.GUIAssemble.Value = false;
                 }
             }
         }
 
-        bool canAttach() { return transform.IsChildOf(BSFDinteraction.ItemPivot) && attachmentTrigger.transform.childCount == 0 && !isFitted; }
+        bool canAttach(AttachPivot pivot) { return transform.IsChildOf(BSFDinteraction.ItemPivot) && pivot.attachmentTrigger.transform.childCount == 0 && !isFitted; }
 
-        public void Attach(bool playAudio)
+        public void Attach(bool playAudio, int ID = 0)
         {
             if (isFitted) return;
 
-            transform.parent = attachmentPoint.transform;
+            if (CurrentPivot == null) { CurrentPivot = Pivots[ID]; }
+
+            transform.parent = Pivots[ID].attachmentPoint.transform;
+            FittmentID = ID;
             transform.localPosition = Vector3.zero;
             transform.localEulerAngles = Vector3.zero;
-            StartCoroutine(FixParent(attachmentPoint.transform));
+            StartCoroutine(FixParent(CurrentPivot.attachmentPoint.transform));
             StartCoroutine(LateAttach(playAudio));
             if (boltParent != null)
             {
@@ -127,7 +152,7 @@ namespace BSFDTestbed
 
             if (playAudio) MasterAudio.PlaySound3DAtTransform("CarBuilding", partTrigger.transform, 1f, 1f, 0f, "assemble");
             partTrigger.enabled = false;
-            attachmentTrigger.enabled = false;
+            CurrentPivot.attachmentTrigger.enabled = false;
             gameObject.tag = "Untagged";
             isFitted = true;
         }
@@ -164,7 +189,7 @@ namespace BSFDTestbed
                 rb.useGravity = true;
                 rb.detectCollisions = true;
             }
-            attachmentTrigger.enabled = true;
+            CurrentPivot.attachmentTrigger.enabled = true;
             isFitted = false;
             StartCoroutine(FixParent(null));
             if (disableColliders && !destroyRigidbody) { rb.detectCollisions = true; }
@@ -199,7 +224,9 @@ namespace BSFDTestbed
                 rb.collisionDetectionMode = collmode;
                 rb.interpolation = interpolationmode;
             }
-            attachmentTrigger.enabled = true;
+            CurrentPivot.attachmentTrigger.enabled = true;
+            CurrentPivot = null;
+            FittmentID = 0;
             isFitted = false;
         }
 
