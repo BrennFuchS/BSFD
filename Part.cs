@@ -28,7 +28,7 @@ namespace BSFDTestbed
         public bool destroyRigidbody = false;
         public Collider partTrigger; // Trigger of part, used for collision test between attachmentTrigger.
 
-        //parts(things you are attaching to) related variables
+        //part (things you are attaching to) related variables
         public List<AttachPivot> Pivots;
         private AttachPivot CurrentPivot;
 
@@ -53,7 +53,7 @@ namespace BSFDTestbed
 
             if (bolts.Length != 0 && boltParent != null)
             {
-                StartCoroutine(UpdatePartTightness());
+                UpdatePartTightness();
             }
 
             UpdateIDs();
@@ -72,18 +72,19 @@ namespace BSFDTestbed
 
         void FixedUpdate()
         {
+            if (bolts.Length != 0 && boltParent != null)
+            {
+                UpdatePartTightness();
+            }
+
             if (isFitted) PartAttached();
         }
 
-        IEnumerator UpdatePartTightness()
+        void UpdatePartTightness()
         {
-            while (true)
-            {
-                int _tightness = 0;
-                foreach (var b in bolts) _tightness += b.currentBoltStep;
-                tightness = _tightness;
-                yield return new WaitForSeconds(3f);
-            }
+            int _tightness = 0;
+            foreach (var b in bolts) _tightness += b.currentBoltStep;
+            tightness = _tightness;
         }
 
         IEnumerator FixParent(Transform parent)
