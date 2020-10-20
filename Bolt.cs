@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace BSFDTestbed
+namespace BSFD
 {
     public class Bolt : MonoBehaviour
     {

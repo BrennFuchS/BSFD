@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Linq;
-using System;
 using System.Collections.Generic;
 
-namespace BSFDTestbed
+namespace BSFD
 {
     public class AttachPivot : MonoBehaviour
     {
@@ -46,6 +44,11 @@ namespace BSFDTestbed
         // Use this for initialization
         void Start()
         {
+            if(FindObjectOfType<BSFDinteraction>() == null)
+            {
+                GameObject.Find("PLAYER").AddComponent<BSFDinteraction>();
+            }
+
             rb = gameObject.GetComponent<Rigidbody>();
             mass = rb.mass;
             collmode = rb.collisionDetectionMode;

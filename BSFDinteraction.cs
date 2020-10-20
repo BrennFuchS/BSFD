@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using HutongGames.PlayMaker;
-using System.Net.NetworkInformation;
 
-namespace BSFDTestbed
+namespace BSFD
 {
     public class BSFDinteraction : MonoBehaviour
     {

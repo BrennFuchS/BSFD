@@ -7,8 +7,8 @@
     <ProjectGuid>{2CEAE666-CBA5-4FA6-AEE3-D6C5CFB2DE20}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BSFDTestbed</RootNamespace>
-    <AssemblyName>BSFDTestbed</AssemblyName>
+    <RootNamespace>BSFD</RootNamespace>
+    <AssemblyName>BSFD</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
@@ -59,9 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bolt.cs" />
-    <Compile Include="BSFDTestbed.cs" />
     <Compile Include="BSFDinteraction.cs" />
-    <Compile Include="OnAttachExampleMono.cs" />
     <Compile Include="Part.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
